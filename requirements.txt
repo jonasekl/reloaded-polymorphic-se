@@ -2,6 +2,8 @@ pyquery
 mechanize
 requests
 eyeD3
+dateutil
+
 flask
 gunicorn
 boto
