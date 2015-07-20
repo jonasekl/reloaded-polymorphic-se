@@ -2,7 +2,7 @@ pyquery
 mechanize
 requests
 eyeD3
-dateutil
+python-dateutil
 
 flask
 gunicorn
