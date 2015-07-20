@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+    <channel>
+        <title>Big O And Dukes Reloaded</title>
+        <link>http://www.bigoanddukes.com/reloaded</link>
+        <language>en-us</language>
+        <copyright>Big O And Dukes</copyright>
+        <itunes:subtitle>Big O And Dukes Reloaded</itunes:subtitle>
+        <itunes:author>Big O And Dukes</itunes:author>
+        <itunes:summary>Big O And Dukes Reloaded</itunes:summary>
+        <description>Big O And Dukes Reloaded</description>
+        <itunes:owner>
+            <itunes:name>Big O And Dukes</itunes:name>
+            <itunes:email>hello@bigoanddukes.com</itunes:email>
+        </itunes:owner>
+        <itunes:image href="http://x.polymorphic.se/image/boad.jpg" />
+        <itunes:category text="Comedy"/>
+{% for ep in eps %}
+    <item>
+        <title>{{ ep }}</title>
+        <itunes:author>Big O And Dukes</itunes:author>
+        <itunes:subtitle>{{ ep }}</itunes:subtitle>
+        <itunes:summary>{{ ep }}</itunes:summary>
+        <itunes:image href="http://x.polymorphic.se/image/boad.jpg" />
+        <enclosure url="https://s3.amazonaws.com/jonasekl-reloaded/{{ ep }}" type="audio/mpeg" />
+        <guid>https://s3.amazonaws.com/jonasekl-reloaded/{{ ep }}</guid>
+        <pubDate>{{ ep[0:ep.find(' '):] if ep.find(' ')>0 else ep }}</pubDate>
+    </item>
+{% endfor %}
+</channel>
+</rss>
