@@ -1,3 +1,7 @@
+pyquery 
+mechanize
+requests
+eyeD3
 flask
 gunicorn
 boto
