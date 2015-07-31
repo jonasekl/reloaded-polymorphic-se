@@ -3,9 +3,17 @@ from flask import Flask, render_template, request, Response
 from functools import wraps
 import os,boto
 import boad
+import atexit
+from apscheduler.scheduler import Scheduler
 
 app = Flask(__name__)
+cron = Scheduler(daemon=True)
+cron.start()
 
+@cron.interval_schedule(hours=1)
+def job_function():
+    # Do your work here
+    print 'get latest reloaded eps'
 
 def check_auth(username, password):
     """This function is called to check if a username /
@@ -35,6 +43,10 @@ def requires_auth(f):
 def feed():
     b = boad.BOAD()
     return render_template('feed.html', eps=b.get_s3_eps(), mimetype='application/rss+xml')
+
+
+# Shutdown your cron thread if the web process is stopped
+atexit.register(lambda: cron.shutdown(wait=False))
 
 if __name__ == '__main__':
     print 'start boad server'
