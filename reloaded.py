@@ -9,9 +9,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
 cron = BackgroundScheduler()
-cron.start()
+cron.add_job(job_function, 'cron', minute='*/5', hour='*')
 
-@cron.interval_schedule(hours=1)
 def job_function():
     # Do your work here
     print 'get latest reloaded eps'
