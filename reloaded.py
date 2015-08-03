@@ -4,7 +4,8 @@ from functools import wraps
 import os,boto
 import boad
 import atexit
-from apscheduler.scheduler import BackgroundScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 app = Flask(__name__)
 cron = BackgroundScheduler()
