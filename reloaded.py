@@ -8,12 +8,12 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 
 app = Flask(__name__)
-cron = BackgroundScheduler()
-cron.add_job(job_function, 'cron', minute='*/5', hour='*')
-
 def job_function():
     # Do your work here
     print 'get latest reloaded eps'
+
+cron = BackgroundScheduler()
+cron.add_job(job_function, 'cron', minute='*/5', hour='*')
 
 def check_auth(username, password):
     """This function is called to check if a username /
