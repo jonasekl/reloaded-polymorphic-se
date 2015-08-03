@@ -4,10 +4,10 @@ from functools import wraps
 import os,boto
 import boad
 import atexit
-from apscheduler.scheduler import Scheduler
+from apscheduler.scheduler import BackgroundScheduler
 
 app = Flask(__name__)
-cron = Scheduler(daemon=True)
+cron = BackgroundScheduler()
 cron.start()
 
 @cron.interval_schedule(hours=1)
