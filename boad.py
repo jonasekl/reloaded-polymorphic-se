@@ -47,30 +47,24 @@ class BOAD:
         br = self.login()
         html = br.open('%s%s' % (self.list_url, page_number or self.page_number)).get_data()
         d = PyQuery(html)
-#        print [(dir(x), x.getchildren()) for x in d("#latest-podcast-wrapper")]
         for div in d('#latest-podcast-wrapper'):
             children = div.getchildren()
-#            print [x.tag for x in children[0].getchildren()]
-#            print dir(children[0].getchildren()[1])
             title = children[0].getchildren()[1].text
             date = children[0].getchildren()[2].text
             mp3 = children[0].getchildren()[3].getchildren()[4].getchildren()[0].get("href")
-
-
-#            print 'title:', title, 'date:', date, 'mp3:', mp3
             eps.append({'title' : title, 'date' : date, 'mp3' : mp3})
-
+        return eps
 #        print [x.keys() for x in d(".downloadLink")]
-        self.save_metadata(eps)
+        #self.save_metadata(eps)
 
     def download(self):
-        for ep in json.loads(open('./metadata.json').read()):
-            if not os.path.exists('%s/%s' % (self.mp3_path, self._get_filename(ep.get('mp3')))):
-                print '"%s" does not exist' % self._get_filename(ep.get('mp3'))
-                self._download_file(ep.get('mp3'))
-                print 'file downloaded, will set id3 tags'
+        eps_in_s3 = self.get_s3_eps()
+        eps_on_page = self.get_page(1)
+        for ep in eps_on_page:
+            if not ep in eps_in_s3:
+                self._download_file(ep)
                 self._set_id3tags(ep)
-
+        
     def _download_file(self, url):
         print('wget --directory-prefix=%s %s' % (self.mp3_path, url))
         os.popen('wget --directory-prefix=%s %s' % (self.mp3_path, url))
@@ -81,16 +75,6 @@ class BOAD:
     def _set_id3tags(self, ep):
         date = parser.parse(ep.get('date'))
         subprocess.call(['/usr/local/bin/eyeD3', '-a', 'Big O and Dukes Reloaded', '-t', '%s %s' % (date.strftime('%Y-%m-%d'), ep.get('title')), '%s/%s' % (self.mp3_path,  self._get_filename(ep.get('mp3'))) ])
-
-    def save_metadata(self, eps):
-        already = json.loads(open('./metadata.json').read())
-        all=[]
-        for e in already:
-            if not [x for x in eps if x["date"] == e["date"]]:
-                all.append(e)
-        all += eps
-        with open('./metadata.json', 'w') as f:
-            f.write(json.dumps(all, indent=4))
 
     def get_eps(self):
         afs = []
@@ -103,7 +87,7 @@ class BOAD:
     def get_s3_eps(self):
         conn = boto.connect_s3()
         bucket = conn.get_bucket(self.bucket_name)
-        return sorted([key.key for key in bucket.list()], reverse=True)
+        return sorted([key.key.replace(' ', '+') for key in bucket.list()], reverse=True)
             
             
         
@@ -115,6 +99,7 @@ class BOAD:
                 key = Key(bucket)
                 key.key = ep[0]
                 key.set_contents_from_filename(ep[1]['filename'])
+                key.set_acl('public-read')
 
 if __name__=='__main__':
 #    parser = argparse.ArgumentParser()
